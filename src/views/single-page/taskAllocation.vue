@@ -257,6 +257,171 @@
       </table>
     </Modal>
     <!-- MultipleBoxDialog -->
+    <!-- 单温区订单回复弹框 -->
+    <Modal
+      v-model="OneOrderReply"
+      title="单温区订单回复"
+      :loading="loading"
+      class-name="vertical-center-modal"
+      :closable="false"
+      width="50%"
+    >
+      <Row>
+        <Form :model="OrderReplyFrom" inline :label-width="100" >
+          <Row>
+            <i-col>
+              <FormItem label="取件时间"  :label-width="70">
+                <DatePicker
+                  type="date"
+                  placeholder="Select date"
+                  style="width: 200px"
+                  v-model="OrderReplyFrom.Time"
+                ></DatePicker>
+                <TimePicker
+                  :disabled-hours="[0,1,2,3,4,5,6,18,19,20,21,22,23]"
+                  :steps="[1, 30]"
+                  placeholder="Select time"
+                  style="width:112px"
+                  format="HH:mm"
+                  v-model="OrderReplyFrom.hours"
+                ></TimePicker>
+              </FormItem>
+            
+              <div class="my-box">
+                <Row>
+                  <i-col>
+                    <FormItem label="运单号码" style="margin: -25px 0 0;background: #fff">
+                      <Input></Input>
+                    </FormItem>
+                  </i-col>
+                </Row>
+                <Row>
+                  <i-col :xl="5" :lg="24">
+                    <FormItem label="客户账号">
+                      <Input v-model="OrderReplyFrom.AccountNumber" disabled></Input>
+                    </FormItem>
+                  </i-col>
+                  <i-col :xl="{span: 5, offset: 2}" :lg="24">
+                    <FormItem label="目的城市">
+                      <Input v-model="OrderReplyFrom.GetCity"></Input>
+                    </FormItem>
+                  </i-col>
+                </Row>
+                <Row>
+                 
+                  <i-col :xl="5" :lg="24">
+                    <FormItem label="产品名称">
+                      <Input v-model="OrderReplyFrom.CargoName" disabled></Input>
+                    </FormItem>
+                  </i-col>
+                  <i-col :xl="{span: 5, offset: 2}" :lg="24">
+                    <FormItem label="体积重量">
+                      <Input v-model="OrderReplyFrom.CountWeight" disabled></Input>
+                    </FormItem>
+                  </i-col>
+                  <i-col :xl="5" :lg="24">
+                    <FormItem label="产品体积">
+                      <Input v-model="OrderReplyFrom.CountVolume" disabled></Input>
+                    </FormItem>
+                  </i-col>
+                  <i-col :xl="5" :lg="24">
+                    <FormItem label="产品件数">
+                      <Input v-model="OrderReplyFrom.Jian" disabled></Input>
+                    </FormItem>
+                  </i-col>
+                </Row>
+                <Row>
+                  <i-col :xl="{span: 5, offset: 7}">
+                    <FormItem label="货物价值">
+                      <Input v-model="OrderReplyFrom.CargoPrice"></Input>
+                    </FormItem>
+                  </i-col>
+                  <i-col :xl="5" :lg="24">
+                    <FormItem label="包装前盒数">
+                      <Input v-model="OrderReplyFrom.Num"></Input>
+                    </FormItem>
+                  </i-col>
+                  <i-col :xl="5" :lg="24">
+                    <FormItem label="产品重量">
+                      <Input v-model="OrderReplyFrom.AWeight"></Input>
+                    </FormItem>
+                  </i-col>
+                </Row>
+              </div>
+             
+              <div class="my-box">
+                <Row>
+                  <i-col>
+                    <FormItem label="温度要求" style="margin: -25px 0 0;background: #fff">
+                      <Select v-model="OrderReplyFrom.WDQJ">
+                        <Option value="beijing">New York11111111</Option>
+                        <Option value="shanghai">London</Option>
+                        <Option value="shenzhen">Sydney</Option>
+                      </Select>
+                    </FormItem>
+                  </i-col>
+                  <i-col>
+                    <div style="display: flex;flex-wrap: wrap" class="zhangwq">
+                      <template v-for="(item,index) in boxList">
+                        <FormItem :label="item.PackageName" :key="index">
+                          <Input
+                            v-model="OrderReplyFrom[item.Jian]"
+                            style="width: 60px;"
+                            :disabled="item.Idisabled"
+                            v-on:input="isClick(item)"
+                          ></Input>
+                        </FormItem>
+                      </template>
+                    </div>
+                  </i-col>
+                  <i-col>
+                    <template v-for="(item,index) in zibeibao">
+                      <FormItem :label="item.PackageName2" :key="index">
+                        <Input
+                          v-model="OrderReplyFrom.zibeibaoJian2"
+                          style="width: 60px;"
+                          :disabled="item.Idisabled"
+                        ></Input>
+                      </FormItem>
+                    </template>
+                  </i-col>
+                </Row>
+              </div>
+              <div class="bottom-box">
+                <Row>
+                  <i-col>
+                    <FormItem label="货物尺寸"  :label-width="70">
+                      <Input v-model="OrderReplyFrom.CargoSizeAll" disabled></Input>
+                    </FormItem>
+                  </i-col>
+                  <i-col>
+                    <FormItem label="货物条码"  :label-width="70">
+                      <Input v-model="OrderReplyFrom.BarCod"></Input>
+                    </FormItem>
+                  </i-col>
+                </Row>
+              </div>
+            </i-col>
+          </Row>
+        </Form>
+      </Row>
+       <div slot="footer">
+            <Button type="error"  >取消</Button>
+              <Button type="primary"   >保存</Button>
+        </div>
+    </Modal>
+
+    <!-- 单温区订单回复弹框 -->
+    <!-- 多温区订单回复弹框 -->
+    <Modal
+      v-model="MoreOrderReply"
+      title="多温区订单回复"
+      :loading="loading"
+      :footer-hide="true"
+      :closable="false"
+      width="50%"
+    ></Modal>
+    <!-- 多温区订单回复弹框 -->
   </div>
 </template>
 
@@ -274,6 +439,42 @@ import {
 export default {
   data() {
     return {
+      zibeibaoJian2: "",
+      zibeibao: [{ PackageName2: "自备包材重量", Idisabled: true }],
+      boxList: [
+        { PackageName: "4L", Jian: "", Idisabled: true },
+        { PackageName: "12L", Jian: "", Idisabled: true },
+        { PackageName: "28L", Jian: "", Idisabled: true },
+        { PackageName: "35L", Jian: "", Idisabled: true },
+        { PackageName: "45L", Jian: "", Idisabled: true },
+        { PackageName: "56L", Jian: "", Idisabled: true },
+        { PackageName: "70L", Jian: "", Idisabled: true },
+        { PackageName: "97L", Jian: "", Idisabled: true },
+        { PackageName: "130L", Jian: "", Idisabled: true },
+        { PackageName: "150L", Jian: "", Idisabled: true },
+        { PackageName: "CW", Jian: "", Idisabled: true },
+        { PackageName: "CW(冬)", Jian: "", Idisabled: true },
+        { PackageName: "GB(小)", Jian: "", Idisabled: true },
+        { PackageName: "GB(大)", Jian: "", Idisabled: true },
+        { PackageName: "新GB(大)", Jian: "", Idisabled: true },
+        { PackageName: "A箱", Jian: "", Idisabled: true },
+        { PackageName: "B箱", Jian: "", Idisabled: true },
+        { PackageName: "托盘保温箱", Jian: "", Idisabled: true },
+        { PackageName: "自备包材", Jian: "", Idisabled: true },
+        // { PackageName: "自备包材量", Jian: "" ,Idisabled:true, },
+        { PackageName: "XS26", Jian: "", Idisabled: true },
+        { PackageName: "xs27", Jian: "", Idisabled: true },
+        { PackageName: "xs28", Jian: "", Idisabled: true },
+        { PackageName: "xs29", Jian: "", Idisabled: true },
+        { PackageName: "XPS保温箱", Jian: "", Idisabled: true }
+      ],
+      OrderReplyFrom: {
+        Time: "07:0",
+        hours: ""
+      },
+      OneOrderReply: false, //单温区订单回复
+      MoreOrderReply: false, //多温区订单回复
+
       MultipleTemperatureMthosDialog: false,
       MultipleBoxDialogMthos: false,
       wdqjContent: [],
@@ -572,10 +773,16 @@ export default {
     };
   },
   methods: {
-    //订单回复
-    Acknowledgment(row){
-      console.log(row,8)
-
+    //点击订单回复判断是单温区还是多温区
+    Acknowledgment(row) {
+      console.log(row, 8);
+      if (row.WDQJ !== "多种温区") {
+        //单温区订单回复
+        this.OneOrderReply = true;
+      } else {
+        //多温区订单回复
+        this.MoreOrderReply = true;
+      }
     },
     //每行多种温区弹框
     MultipleTemperature(row) {
@@ -839,6 +1046,15 @@ export default {
 .isb {
   display: none;
 }
+.my-box {
+  border-radius: 5px;
+
+  padding: 10px;
+  margin: 35px 0px 0;
+  position: relative;
+
+  border: #06c solid 1px;
+}
 </style>
 <style>
 .ivu-table .demo-table-info-cell-name {
@@ -849,5 +1065,8 @@ export default {
   border: 1px solid #e6eaee;
   border-collapse: collapse;
   padding: 5px;
+}
+.bottom-box {
+  margin: 10px 0;
 }
 </style>
