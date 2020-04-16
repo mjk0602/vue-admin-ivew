@@ -25,33 +25,35 @@
             </FormItem>
             <Button type="primary" @click="getData()">搜索</Button>
             <!--  右侧筛选   isShowInDrawer代表 右侧展示需要判断的属性    hide 表示默认表格隐藏的属性   -->
-           
-              <span  @click="development">
-                更多操作<i style :class="sanja ? 'sanjiao' : 'sanjiao2'"></i>
-              </span>
-           <div style="float:right">
-                    <FormItem>
-              <Button @click="value1 = true" type="primary">筛选</Button>
-              <Drawer :closable="false" v-model="value1">
-                <div style="border-bottom: 1px solid #e9e9e9;padding-bottom:6px;margin-bottom:6px;">
-                  <Checkbox :value="checkAll" @click.prevent.native="handleCheckAll">全选</Checkbox>
-                </div>
-                <CheckboxGroup
-                  v-for="(item,index) in rightColumns"
-                  v-model="checkAllGroup"
-                  @on-change="checkAllGroupChange"
-                >
-                  <Checkbox :label="item.title">{{item.title}}</Checkbox>
-                </CheckboxGroup>
-              </Drawer>
-            </FormItem>
-            <!--右侧筛选 isShowInDrawer代表 右侧展示需要判断的属性    hide 表示默认表格隐藏的属性   -->
 
-            <Button type="success" style="margin:0 10px">导出</Button>
+            <span @click="development">
+              更多操作
+              <i style :class="sanja ? 'sanjiao' : 'sanjiao2'"></i>
+            </span>
+            <div style="float:right">
+              <FormItem>
+                <Button @click="value1 = true" type="primary">筛选</Button>
+                <Drawer :closable="false" v-model="value1">
+                  <div
+                    style="border-bottom: 1px solid #e9e9e9;padding-bottom:6px;margin-bottom:6px;"
+                  >
+                    <Checkbox :value="checkAll" @click.prevent.native="handleCheckAll">全选</Checkbox>
+                  </div>
+                  <CheckboxGroup
+                    v-for="(item,index) in rightColumns"
+                    v-model="checkAllGroup"
+                    @on-change="checkAllGroupChange"
+                  >
+                    <Checkbox :label="item.title">{{item.title}}</Checkbox>
+                  </CheckboxGroup>
+                </Drawer>
+              </FormItem>
+              <!--右侧筛选 isShowInDrawer代表 右侧展示需要判断的属性    hide 表示默认表格隐藏的属性   -->
 
-            <Button type="error">重置</Button>
-           </div>
-     
+              <Button type="success" style="margin:0 10px">导出</Button>
+
+              <Button type="error">重置</Button>
+            </div>
           </i-col>
           <div :class="isMeng ? 'isA' : 'isb'">
             <i-col>
@@ -192,7 +194,15 @@
           <span v-else>{{row.BaoCai}}</span>
         </template>
         <template slot-scope="{ row, index }" slot="action">
-          <Button type="primary" size="small" style="margin-right: 5px" @click="show(index)">订单回复</Button>
+          <Button
+            type="text"
+            size="small"
+            style="margin-right: 5px"
+            @click="Acknowledgment(row)"
+            :disabled="row.IsOk === '1'?true:false"
+          >
+            <Icon :color="row.IsOk === '0'?'deepskyblue': '#ccc'" type="ios-undo" />
+          </Button>
         </template>
       </Table>
       <Page
@@ -213,6 +223,7 @@
       title="温度计编码"
       :loading="loading"
       :footer-hide="true"
+      :closable="false"
     >
       <div style="display: flex;flex-wrap: wrap">
         <Button
@@ -229,8 +240,14 @@
     <!-- MultipleTemperatureMthosDialog -->
     <!-- MultipleBoxDialog -->
 
-    <Modal v-model="MultipleBoxDialogMthos" title="多种箱型" :loading="loading" :footer-hide="true">
-      <table class="mailTable" style="width: 100%;" >
+    <Modal
+      v-model="MultipleBoxDialogMthos"
+      title="多种箱型"
+      :loading="loading"
+      :footer-hide="true"
+      :closable="false"
+    >
+      <table class="mailTable" style="width: 100%;">
         <tr v-for="(index,item) in Boxcontent">
           <td>{{item}}</td>
           <template v-for="(index2,item2) in Boxcontent[item]">
@@ -305,7 +322,7 @@ export default {
           title: "温度区间",
           key: "WDQJ",
           slot: "WDQJ",
-          width: 100,
+          width: 120,
           align: "center"
         },
         {
@@ -555,6 +572,11 @@ export default {
     };
   },
   methods: {
+    //订单回复
+    Acknowledgment(row){
+      console.log(row,8)
+
+    },
     //每行多种温区弹框
     MultipleTemperature(row) {
       const OrderId = row.id;
@@ -822,10 +844,10 @@ export default {
 .ivu-table .demo-table-info-cell-name {
   color: #2d8cf0;
 }
-  .mailTable,
-    .mailTable tr td {
-        border: 1px solid #e6eaee;
-        border-collapse: collapse;
-        padding: 5px;
-    }
+.mailTable,
+.mailTable tr td {
+  border: 1px solid #e6eaee;
+  border-collapse: collapse;
+  padding: 5px;
+}
 </style>
