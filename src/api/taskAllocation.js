@@ -14,3 +14,7 @@ export const MultipleTemperatureMthos = (params) =>{
 export const   MultipleBoxMthos = (params) =>{
     return axios.request({url:'taskallocation/checkbox',method:'post',params})
 }
+//订单回复显示数据请求的接口
+export const   OrderTReplyShow =(params) =>{
+    return axios.request({url:'taskallocation/ordershow',method:'post',params})
+}
