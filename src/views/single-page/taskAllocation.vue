@@ -442,7 +442,7 @@
         </Form>
       </Row>
       <div slot="footer">
-        <Button type="error" @click>取消</Button>
+        <Button type="error">取消</Button>
         <Button type="primary">保存</Button>
       </div>
     </Modal>
@@ -1011,7 +1011,6 @@ export default {
     refresh() {
       this.formInline = {};
       this.initSearchData();
-
       this.getData();
     },
     //点击订单回复判断是单温区还是多温区
@@ -1037,12 +1036,10 @@ export default {
         OrderId: OrderId
       };
       const res = await OrderTReplyShow(params);
-      console.log(res.data.data);
       if (WDQJ !== "多种温区") {
         //单温区订单回复
         this.OneOrderReply = true;
         this.OrderReplyFrom = res.data.data;
-        // 这些有用？不能想办法去掉？不能把
         this.boxList.forEach(item => {
           item.Jian = "";
         });
@@ -1118,7 +1115,6 @@ export default {
         this.total = res.data.data.Count;
       } else {
         this.loading = false;
-
         this.tableData = [];
         this.total = 0;
       }
@@ -1139,7 +1135,6 @@ export default {
       const res = await MultipleBoxMthos(params);
       this.Boxcontent = res.data.data;
     },
-
     //每页改变的时候 123
     handleChangePage(val) {
       this.loading = true;
@@ -1192,10 +1187,8 @@ export default {
       });
       this.rightColumns = arr;
     },
-
     //选中的状态改变的时候的事件
     checkAllGroupChange(data) {
-      console.log(data, 8);
       this.handleCheckedInTable(data);
     },
     // 全选后改变表头字段，将全选后的所有项放到表头里
@@ -1253,7 +1246,6 @@ export default {
       }
       Object.assign(params, { Type });
       const res = await getlinkage(params);
-      console.log(res);
       if (Type === "SendsCompany") {
         this.companyList = res.data.data;
       } else if (Type === "GetDepart") {
@@ -1270,10 +1262,6 @@ export default {
         Depart: this.userInfo.Depart
       };
       const obj = JSON.parse(JSON.stringify(this.formInline));
-
-      // obj.BeginTime = obj.xdtime[0];
-      // obj.EndTime = obj.xdtime[1];
-      // delete obj.xdtime;
       obj.OrderBeginTime = obj.TakeTime[0];
       obj.OrderEndTime = obj.TakeTime[1];
       delete obj.TakeTime;
@@ -1295,13 +1283,9 @@ export default {
     initSearchData() {
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
-      const dateTime =
-        new Date(currentYear, currentMonth, "01", "0", "0", "0").getTime() /
-        1000;
+      const dateTime = new Date(currentYear, currentMonth, "01", "0", "0", "0").getTime() / 1000;
       const time1 = getDate(dateTime, "year");
       const time2 = getDate(new Date().getTime() / 1000, "year");
-
-      //this.formInline.xdtime = [time1, time2];
       this.formInline.TakeTime = [time1, time2];
     }
   },
