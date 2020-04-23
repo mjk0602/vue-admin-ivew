@@ -18,3 +18,11 @@ export const   MultipleBoxMthos = (params) =>{
 export const   OrderTReplyShow =(params) =>{
     return axios.request({url:'taskallocation/ordershow',method:'post',params})
 }
+//获取司机弹框
+export const  DriveNameData = (params)=>{
+    return axios.request({url:'taskallocation/checkdriver',method:'post',params})
+}
+//保存取件司机
+export const  saveTakeDriveData = (params)=>{
+    return axios.request({url:'taskallocation/fenpeidriver',method:'post',params})
+}

@@ -139,7 +139,7 @@
       <Form inline :label-width="100">
         <Row type="flex" justify="space-between">
           <i-col :span="8">
-            <Button type="primary" icon="ios-add">取件司机</Button>
+            <Button type="primary" icon="ios-add" @click="SendDriver">取件司机</Button>
           </i-col>
           <i-col :span="4">
             <FormItem label="总件数">287</FormItem>
@@ -148,7 +148,16 @@
         </Row>
       </Form>
 
-      <Table size="small" border :loading="loading" stripe :columns="columns" :data="tableData">
+      <Table
+        size="small"
+        border
+        :loading="loading"
+        stripe
+        :columns="columns"
+        :data="tableData"
+        ref="selection"
+        @on-selection-change="handleSelectionChange"
+      >
         <template slot-scope="{ row, index }" slot="Manager">
           <Poptip transfer trigger="hover">
             <span slot="content">{{row.Telephone}}</span>
@@ -217,6 +226,34 @@
         style="margin: 20px 0 0"
       ></Page>
     </Card>
+    <!-- 取件司机提示框 -->
+    <Modal
+      v-model="TakeDriverVisible"
+      title="取件司机"
+      :loading="loading"
+      :footer-hide="false"
+      :closable="false"
+    >
+      <Row>
+        <Form>
+          <FormItem>
+            <Select style="width: 211px" v-model="driverName" :transfer="true" filterable clearable>
+              <Option
+                v-for="(item1,index) in driverNameData"
+                :key="index"
+                :label="`${item1.TrueName}`+''+` ${item1.UserName}`"
+                :value="`${item1.TrueName}`+''+ ` ${item1.UserName}`"
+              ></Option>
+            </Select>
+          </FormItem>
+        </Form>
+      </Row>
+      <div slot="footer">
+        <Button type="error" @click="clearTakeDrive">取消</Button>
+        <Button type="primary" @click="saveTakeDrive">保存</Button>
+      </div>
+    </Modal>
+    <!-- 取件司机提示框 -->
     <!-- MultipleTemperatureMthosDialog -->
     <Modal
       v-model="MultipleTemperatureMthosDialog"
@@ -352,11 +389,9 @@
                 <Row>
                   <i-col>
                     <FormItem label="温度要求" style="margin: -25px 0 0;background: #fff">
-                      <Select v-model="OrderReplyFrom.WDQJ">
-                        <Option value="beijing">New York11111111</Option>
-                        <Option value="shanghai">London</Option>
-                        <Option value="shenzhen">Sydney</Option>
-                      </Select>
+                      <!-- <Select v-model="OrderReplyFrom.WDQJ">
+                        <Option ></Option>
+                      </Select> -->
                     </FormItem>
                   </i-col>
                   <i-col>
@@ -499,7 +534,9 @@
               <Row>
                 <i-col>
                   <template>
-                    <Table border :columns="columns1" :data="MoreOrderList"></Table>
+                    <Table border :columns="columns1" :data="MoreOrderList">
+                      <template slot-scope="{ row, index }" slot="action"></template>
+                    </Table>
                   </template>
                 </i-col>
               </Row>
@@ -512,13 +549,11 @@
                 <i-col>
                   <FormItem label="温度要求">
                     <Select v-model="MoreReplyFrom.wdNedda">
-                      <Option value="beijing">New York11111111</Option>
-                      <Option value="shanghai">London</Option>
-                      <Option value="shenzhen">Sydney</Option>
+                      <Option v-for="(item,i) in boxListBOXS" :label="item.WDQJ" :value="item.WDQJ"></Option>
                     </Select>
                   </FormItem>
                   <FormItem label="温度计编码">
-                    <Input v-model="MoreReplyFrom.CargoM"></Input>
+                    <Input v-model="MoreReplyFrom.CargoM" @keyup.enter.native="AddwdjNumber"></Input>
                   </FormItem>
                 </i-col>
               </Row>
@@ -526,7 +561,7 @@
           </i-col>
         </Row>
         <div slot="footer">
-          <Button type="error">取消</Button>
+          <Button type="error" @click>取消</Button>
           <Button type="primary">保存</Button>
         </div>
       </Form>
@@ -546,11 +581,17 @@ import {
   getlinkage,
   MultipleTemperatureMthos,
   MultipleBoxMthos,
-  OrderTReplyShow
+  OrderTReplyShow,
+  DriveNameData,
+  saveTakeDriveData
 } from "@/api/taskAllocation";
 export default {
   data() {
     return {
+      boxListBOXS: [],
+      selection: [],
+      driverNameData: [], //司机姓名数组
+      driverName: "",
       columns1: [
         {
           title: "温度区间",
@@ -613,6 +654,7 @@ export default {
       },
       OneOrderReply: false, //单温区订单回复
       MoreOrderReply: false, //多温区订单回复
+      TakeDriverVisible: false,
 
       MultipleTemperatureMthosDialog: false,
       MultipleBoxDialogMthos: false,
@@ -640,7 +682,7 @@ export default {
         {
           title: "公司名称",
           key: "Company",
-          width: 200,
+          width: 220,
           align: "center"
         },
         {
@@ -775,7 +817,7 @@ export default {
         {
           title: "录入人",
           key: "entryname",
-          width: 100,
+          width: 130,
           hide: true,
           isShowInDrawer: true,
           align: "center"
@@ -908,10 +950,61 @@ export default {
       departList: [],
       total: 0, //总条数
       page: 1, //当前页
-      limit: 20 //每页条数
+      limit: 20, //每页条数
+      order_id: []
     };
   },
   methods: {
+    //添加温度计编码
+    AddwdjNumber(){
+
+      
+    },
+    handleSelectionChange(val) {
+      this.selection = val;
+      console.log(this.selection, 7777);
+    },
+    //取消
+    clearTakeDrive() {
+      this.TakeDriverVisible = false;
+      this.driverName = "";
+    },
+    //保存取件司机
+    saveTakeDrive() {
+      this.saveTakeDriveData();
+    },
+    //获取分配司机
+    async saveTakeDriveData() {
+      const params = {
+        OrderId: this.order_id.join(","),
+        UserName: this.userInfo.UserName,
+        DriverName: this.driverName.split(" ")[0],
+        DriverCode: this.driverName.split(" ")[1]
+      };
+      const res = await saveTakeDriveData(params);
+      if (res.data.code == "200") {
+        this.TakeDriverVisible = false;
+        this.$Message.success(res.data.msg);
+        this.getData();
+      } else {
+        this.$Message.error(res.data.msg);
+      }
+    },
+    //派送司机
+    SendDriver() {
+      let len = this.selection;
+      if (len.length == 0) {
+        this.$Message.error("请选择需要派送的单子");
+      } else {
+        this.TakeDriverVisible = true;
+        this.order_id = [];
+        let len = this.selection;
+
+        for (let i = 0; i < len.length; i++) {
+          this.order_id.push(len[i].id);
+        }
+      }
+    },
     //重置
     refresh() {
       this.formInline = {};
@@ -926,6 +1019,16 @@ export default {
       const WDQJ = row.WDQJ;
       this.OrderTReplyShow(OrderId, WDQJ);
     },
+    //司机
+    async DriveNameData() {
+      const params = {
+        Company: this.userInfo.Company,
+        Operate: this.userInfo.Operate,
+        Area: this.userInfo.Area
+      };
+      const res = await DriveNameData(params);
+      this.driverNameData = res.data.data;
+    },
     //订单回复显示
     async OrderTReplyShow(OrderId, WDQJ) {
       const params = {
@@ -937,6 +1040,7 @@ export default {
         //单温区订单回复
         this.OneOrderReply = true;
         this.OrderReplyFrom = res.data.data;
+        // 这些有用？不能想办法去掉？不能把
         this.boxList.forEach(item => {
           item.Jian = "";
         });
@@ -960,7 +1064,22 @@ export default {
         this.MoreOrderReply = true;
         this.MoreReplyFrom = res.data.data;
         this.MoreOrderList = res.data.data.Box;
+        this.getWdjNee();
       }
+    },
+    //去重
+    getWdjNee(event) {
+      const newArr = [];
+      this.MoreOrderList.map(
+        item =>
+          newArr.findIndex(({ WDQJ }) => WDQJ === item.WDQJ) === -1 &&
+          newArr.push(item)
+      );
+      this.boxListBOXS = newArr;
+
+      // this.boxListBOXS.forEach(item => {
+      //   this.BoxCargoM[item.WDQJ] = [];
+      // });
     },
     //每行多种温区弹框
     MultipleTemperature(row) {
@@ -1095,6 +1214,8 @@ export default {
       this.isMeng = !this.isMeng; //展示展开的数据
       this.sanja = !this.sanja; //三角符号的展示
     },
+    //获取取件司机
+    getdriverName(e) {},
     //获取公司
     getSendsCompany(e) {
       if (e) {
@@ -1194,6 +1315,7 @@ export default {
     this.getSendsCompany();
     this.GetDepartData();
     this.GetCityData();
+    this.DriveNameData();
   }
 };
 </script>

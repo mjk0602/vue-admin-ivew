@@ -12,6 +12,7 @@ const router = new Router({
   routes,
   mode: 'history'
 })
+//设置路由拦截 默认跳到的位置
 const LOGIN_PAGE_NAME = 'login'
 
 const turnTo = (to, access, next) => {

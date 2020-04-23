@@ -18,6 +18,14 @@ import ParentView from '@/components/ParentView/ParentView.vue'
 
 export default [
   {
+    path: '',
+    name: 'lison16',
+    meta: {
+      href: 'https://github.com/mengmwq/vue-admin-ivew',
+      icon: '_love',
+      title: 'Mjk的github首页'
+    }},
+  {
     path: '/login',
     name: 'login',
     meta: {
@@ -40,10 +48,11 @@ export default [
         path: '/home',
         name: 'home',
         meta: {
-          hideInMenu: true,
+          hideInMenu: false,
           title: '首页',
           notCache: true,
-          icon: 'md-home'
+          icon: 'md-home',
+          href:'http://baidu.com'
         },
         component: () => import('@/views/single-page/Home.vue')
       }
@@ -65,6 +74,7 @@ export default [
         meta: {
           title: '任务分配',
           notCache: false,
+          
          
         },
         component: () => import('@/views/single-page/taskAllocation.vue')
