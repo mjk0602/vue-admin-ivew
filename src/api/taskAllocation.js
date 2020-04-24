@@ -26,3 +26,7 @@ export const  DriveNameData = (params)=>{
 export const  saveTakeDriveData = (params)=>{
     return axios.request({url:'taskallocation/fenpeidriver',method:'post',params})
 }
+//温度计编码验证接口
+export const  ThermometerVerification = (params)=>{
+    return axios.request({url:'taskallocation/checkwdj',method:'post',params})
+}

@@ -235,7 +235,7 @@
       :closable="false"
     >
 
-    
+
       <Row>
         <Form>
           <FormItem>
@@ -585,7 +585,8 @@ import {
   MultipleBoxMthos,
   OrderTReplyShow,
   DriveNameData,
-  saveTakeDriveData
+  saveTakeDriveData,
+  ThermometerVerification
 } from "@/api/taskAllocation";
 export default {
   data() {
@@ -619,7 +620,8 @@ export default {
       MoreOrderList: [],
       MoreReplyFrom: {
         Time: "07:0",
-        hours: ""
+        hours: "",
+        CargoM:"",
       },
       zibeibaoJian2: "",
       zibeibao: [{ PackageName2: "自备包材重量", Idisabled: true }],
@@ -959,6 +961,7 @@ export default {
   methods: {
     //添加温度计编码
     AddwdjNumber(){
+     this.ThermometerVerification()
 
       
     },
@@ -974,6 +977,20 @@ export default {
     //保存取件司机
     saveTakeDrive() {
       this.saveTakeDriveData();
+    },
+    //温度计编码验证
+    async ThermometerVerification(){
+      const params ={
+        WDJ:this.MoreReplyFrom.CargoM,
+      };
+      const res = await ThermometerVerification(params)
+      if(res.data.code ==200){
+        this.$Message.success(res.data.msg)
+        
+
+      }else{
+        this.$Message.error(res.data.msg)
+      }
     },
     //获取分配司机
     async saveTakeDriveData() {

@@ -17,14 +17,7 @@ import ParentView from '@/components/ParentView/ParentView.vue'
  */
 
 export default [
-  {
-    path: '',
-    name: 'lison16',
-    meta: {
-      href: 'https://github.com/mengmwq/vue-admin-ivew',
-      icon: '_love',
-      title: 'Mjk的github首页'
-    }},
+
   {
     path: '/login',
     name: 'login',
