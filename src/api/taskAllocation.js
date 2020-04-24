@@ -26,3 +26,11 @@ export const  DriveNameData = (params)=>{
 export const  saveTakeDriveData = (params)=>{
     return axios.request({url:'taskallocation/fenpeidriver',method:'post',params})
 }
+
+export const  getBoxData = (params)=>{
+    return axios.request({url:'taskallocation/wdqjbox',method:'post',params})
+}
+
+export const  getCheckSize = (params)=>{
+    return axios.request({url:'taskallocation/checksize',method:'post',params})
+}
