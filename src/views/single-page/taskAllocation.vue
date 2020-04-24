@@ -391,9 +391,9 @@
                 <Row>
                   <i-col>
                     <FormItem label="温度要求" style="margin: -25px 0 0;background: #fff">
-                      <!-- <Select v-model="OrderReplyFrom.WDQJ">
-                        <Option ></Option>
-                      </Select> -->
+                      <Select v-model="OrderReplyFrom.WDQJ" @on-change="bindSingleTempChange">
+                        <Option v-for="(item, index) in requiredTempList" :value="item.WDQJ" :key="index">{{item.WDQJ}}</Option>
+                      </Select>
                     </FormItem>
                   </i-col>
                   <i-col>
@@ -401,10 +401,10 @@
                       <template v-for="(item,index) in boxList">
                         <FormItem :label="item.PackageName" :key="index">
                           <Input
-                            v-model="OrderReplyFrom[item.Jian]"
+                            v-model="OrderReplyFrom[item.PackageName]"
                             style="width: 60px;"
                             :disabled="item.Idisabled"
-                            v-on:input="isClick(item)"
+                            @input="bindInputSinglePackageName($event, item, index)"
                           ></Input>
                         </FormItem>
                       </template>
@@ -442,7 +442,7 @@
         </Form>
       </Row>
       <div slot="footer">
-        <Button type="error" @click>取消</Button>
+        <Button type="error">取消</Button>
         <Button type="primary">保存</Button>
       </div>
     </Modal>
@@ -537,7 +537,20 @@
                 <i-col>
                   <template>
                     <Table border :columns="columns1" :data="MoreOrderList">
-                      <template slot-scope="{ row, index }" slot="action"></template>
+                      <template slot-scope="{ row, index }" slot="PackageName">
+                        <Select @on-change="bindPackageNameChange($event, row)" v-model="row.PackageName" transfer @on-open-change="getBoxData($event, row)">
+                          <Option v-for="(item, sindex) in packageList[index]" :value="item.PackageType" :key="sindex">{{ item.PackageType }}</Option>
+                        </Select>
+                      </template>
+                      <template slot-scope="{ row, index }" slot="Jian">
+                        <InputNumber @on-change="bindPackageNameChange(true, row)" :min="1" v-model="row.Jian"></InputNumber>
+                      </template>
+                      <template slot-scope="{ row, index }" slot="VWeight">
+                        <Input v-model="row.VWeight"></Input>
+                      </template>
+                      <template slot-scope="{ row, index }" slot="Size">
+                        <Input v-model="row.Size"></Input>
+                      </template>
                     </Table>
                   </template>
                 </i-col>
@@ -586,7 +599,9 @@ import {
   OrderTReplyShow,
   DriveNameData,
   saveTakeDriveData,
-  ThermometerVerification
+  ThermometerVerification,
+  getBoxData,
+  getCheckSize
 } from "@/api/taskAllocation";
 export default {
   data() {
@@ -602,19 +617,23 @@ export default {
         },
         {
           title: "包装类型",
-          key: "PackageName"
+          key: "PackageName",
+          slot: "PackageName"
         },
         {
           title: "件数",
-          key: "Jian"
+          key: "Jian",
+          slot: 'Jian'
         },
         {
           title: "重量",
-          key: "VWeight"
+          key: "VWeight",
+          slot: 'VWeight'
         },
         {
           title: "货物尺寸",
-          key: "Size"
+          key: "Size",
+          slot: 'Size'
         }
       ],
       MoreOrderList: [],
@@ -955,7 +974,9 @@ export default {
       total: 0, //总条数
       page: 1, //当前页
       limit: 20, //每页条数
-      order_id: []
+      order_id: [],
+      packageList: [],
+      requiredTempList: []
     };
   },
   methods: {
@@ -965,9 +986,76 @@ export default {
 
       
     },
+    bindInputSinglePackageName(e, item, index) {
+      this.$set(this.boxList[index], 'Jian', e)
+      const lists = this.boxList.filter((sItem, sIndex) => {
+        return !sItem.Idisabled && sItem.Jian
+      })
+      console.log(lists)
+      this.getCheckSize('single', lists)
+    },
+    async bindSingleTempChange(e) {
+      this.$set(this.OrderReplyFrom, 'WDQJ', e)
+      const res = await this.getOneBoxData({ WDQJ: e, State: 'Box'})
+      console.log(res)
+      this.BoxContent = res;
+      this.boxList.forEach(item => {
+        item.Jian = "";
+        let index = this.BoxContent.findIndex(v => {
+          return item.PackageName === v.PackageType;
+        });
+        item.Idisabled = index !== -1 ? false : true;
+      });
+    },
+    async getCheckSize(sign, lists) {
+      const params = {
+        Box: JSON.stringify(lists)
+      }
+      let res = await getCheckSize(params)
+      if(res.data.code === '200') {
+        const checkSizeData = res.data
+        if(sign === 'single') {
+          
+          this.$set(this.OrderReplyFrom, 'CountWeight', checkSizeData.CountWeight)
+          this.$set(this.OrderReplyFrom, 'CountVolume', checkSizeData.CountVolume)
+          this.$set(this.OrderReplyFrom, 'Jian', checkSizeData.CountJian)
+          this.$set(this.OrderReplyFrom, 'CargoSizeAll', checkSizeData.CargoSizeAll)
+          
+        } else {
+          this.$set(this.MoreReplyFrom, 'CountWeight', checkSizeData.CountWeight)
+          this.$set(this.MoreReplyFrom, 'CountVolume', checkSizeData.CountVolume)
+          this.$set(this.MoreReplyFrom, 'BoxJian', checkSizeData.CountJian)
+          this.MoreOrderList = checkSizeData.data
+
+        }
+      }
+    },
+    bindPackageNameChange(item, row) {
+      this.$set(this.MoreOrderList[row._index], 'PackageName', row.PackageName)
+      this.$set(this.MoreOrderList[row._index], 'Jian', row.Jian)
+      this.getCheckSize('more', this.MoreOrderList)
+    },
+    async getBoxData(e, row) {
+      if(e) {
+        const params = {
+          WDQJ: row.WDQJ,
+          State: 'Box'
+        }
+        let res = await getBoxData(params)
+        if(res.data.code === '200') {
+          this.$set(this.packageList, row._index, res.data.data)
+        }
+      }
+    },
+    // 获取 单温区  温度要求
+    async getOneBoxData(params) {
+      let res = await getBoxData(params)
+      if(res.data.code === '200') {
+        return res.data.data
+      }
+    },
     handleSelectionChange(val) {
       this.selection = val;
-      console.log(this.selection, 7777);
     },
     //取消
     clearTakeDrive() {
@@ -1028,15 +1116,11 @@ export default {
     refresh() {
       this.formInline = {};
       this.initSearchData();
-
       this.getData();
     },
     //点击订单回复判断是单温区还是多温区
     Acknowledgment(row) {
-      console.log(row, 8);
-      const OrderId = row.id;
-      const WDQJ = row.WDQJ;
-      this.OrderTReplyShow(OrderId, WDQJ);
+      this.OrderTReplyShow(row.id, row.WDQJ);
     },
     //司机
     async DriveNameData() {
@@ -1050,20 +1134,24 @@ export default {
     },
     //订单回复显示
     async OrderTReplyShow(OrderId, WDQJ) {
-      const params = {
-        OrderId: OrderId
-      };
+      const params = { OrderId };
       const res = await OrderTReplyShow(params);
-      console.log(res.data.data);
       if (WDQJ !== "多种温区") {
         //单温区订单回复
         this.OneOrderReply = true;
         this.OrderReplyFrom = res.data.data;
-        // 这些有用？不能想办法去掉？不能把
-        this.boxList.forEach(item => {
+        // 调用获取 单温区  温度要求接口
+        const requiredTempList = await this.getOneBoxData({
+          WDQJ: '',
+          State: 'WDQJ'
+        })
+        console.log(WDQJ)
+        this.requiredTempList = requiredTempList;
+        this.bindSingleTempChange(WDQJ)
+
+        this.boxList.forEach(function(item) {
           item.Jian = "";
-        });
-        this.boxList.forEach(function(item, index) {
+
           if (res.data.data.XiangZi && res.data.data.XiangZi.length) {
             res.data.data.XiangZi.forEach(function(item2, index2) {
               if (item2.PackageType == item.PackageName) {
@@ -1071,8 +1159,6 @@ export default {
               }
             });
           }
-        });
-        this.boxList.forEach(item => {
           let index = res.data.data.PackageAll.findIndex(v => {
             return item.PackageName === v.PackageType;
           });
@@ -1082,7 +1168,12 @@ export default {
         //多温区订单回复
         this.MoreOrderReply = true;
         this.MoreReplyFrom = res.data.data;
+        res.data.data.Box.forEach((item, index) => {
+          item.Jian = +item.Jian
+          this.$set(this.packageList, index, [{PackageType: item.PackageName}] )
+        })
         this.MoreOrderList = res.data.data.Box;
+
         this.getWdjNee();
       }
     },
@@ -1135,7 +1226,6 @@ export default {
         this.total = res.data.data.Count;
       } else {
         this.loading = false;
-
         this.tableData = [];
         this.total = 0;
       }
@@ -1156,7 +1246,6 @@ export default {
       const res = await MultipleBoxMthos(params);
       this.Boxcontent = res.data.data;
     },
-
     //每页改变的时候 123
     handleChangePage(val) {
       this.loading = true;
@@ -1209,10 +1298,8 @@ export default {
       });
       this.rightColumns = arr;
     },
-
     //选中的状态改变的时候的事件
     checkAllGroupChange(data) {
-      console.log(data, 8);
       this.handleCheckedInTable(data);
     },
     // 全选后改变表头字段，将全选后的所有项放到表头里
@@ -1270,7 +1357,6 @@ export default {
       }
       Object.assign(params, { Type });
       const res = await getlinkage(params);
-      console.log(res);
       if (Type === "SendsCompany") {
         this.companyList = res.data.data;
       } else if (Type === "GetDepart") {
@@ -1287,10 +1373,6 @@ export default {
         Depart: this.userInfo.Depart
       };
       const obj = JSON.parse(JSON.stringify(this.formInline));
-
-      // obj.BeginTime = obj.xdtime[0];
-      // obj.EndTime = obj.xdtime[1];
-      // delete obj.xdtime;
       obj.OrderBeginTime = obj.TakeTime[0];
       obj.OrderEndTime = obj.TakeTime[1];
       delete obj.TakeTime;
@@ -1312,13 +1394,9 @@ export default {
     initSearchData() {
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
-      const dateTime =
-        new Date(currentYear, currentMonth, "01", "0", "0", "0").getTime() /
-        1000;
+      const dateTime = new Date(currentYear, currentMonth, "01", "0", "0", "0").getTime() / 1000;
       const time1 = getDate(dateTime, "year");
       const time2 = getDate(new Date().getTime() / 1000, "year");
-
-      //this.formInline.xdtime = [time1, time2];
       this.formInline.TakeTime = [time1, time2];
     }
   },
