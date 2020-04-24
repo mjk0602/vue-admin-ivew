@@ -29,7 +29,7 @@ export const  saveTakeDriveData = (params)=>{
 //温度计编码验证接口
 export const  ThermometerVerification = (params)=>{
     return axios.request({url:'taskallocation/checkwdj',method:'post',params})
-
+}
 export const  getBoxData = (params)=>{
     return axios.request({url:'taskallocation/wdqjbox',method:'post',params})
 }

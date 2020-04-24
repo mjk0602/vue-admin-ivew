@@ -564,12 +564,18 @@
                 <i-col>
                   <FormItem label="温度要求">
                     <Select v-model="MoreReplyFrom.wdNedda">
-                      <Option v-for="(item,i) in boxListBOXS" :label="item.WDQJ" :value="item.WDQJ"></Option>
+                      <Option v-for="(item,i) in boxListBOXS" :key="i" :label="item.WDQJ" :value="item.WDQJ"></Option>
                     </Select>
                   </FormItem>
                   <FormItem label="温度计编码">
                     <Input v-model="MoreReplyFrom.CargoM" @keyup.enter.native="AddwdjNumber"></Input>
                   </FormItem>
+                </i-col>
+                <i-col>
+                  <div v-for="(item, index) in tempNumList" :key="index">
+                    <span>{{item.title}}</span>
+                    <Tag type="border" v-for="(sItem, sIndex) in item.nums" :key="sIndex" closable color="primary" @on-close="handleCloseTag(index, sIndex)">{{sItem}}</Tag>
+                  </div>
                 </i-col>
               </Row>
             </div>
@@ -976,15 +982,14 @@ export default {
       limit: 20, //每页条数
       order_id: [],
       packageList: [],
-      requiredTempList: []
+      requiredTempList: [],
+      tempNumList: []
     };
   },
   methods: {
     //添加温度计编码
     AddwdjNumber(){
      this.ThermometerVerification()
-
-      
     },
     bindInputSinglePackageName(e, item, index) {
       this.$set(this.boxList[index], 'Jian', e)
@@ -1066,6 +1071,34 @@ export default {
     saveTakeDrive() {
       this.saveTakeDriveData();
     },
+    handleCloseTag(index, sIndex) {
+      if(this.tempNumList[index].nums.length > 1) {
+        this.tempNumList[index].nums.splice(sIndex, 1)
+      } else {
+        this.$delete(this.tempNumList, index)
+      }
+    },
+    initTempNumsList() {
+      const tempNumList = JSON.parse(JSON.stringify(this.tempNumList))
+
+      if(tempNumList.length === 0) {
+        tempNumList.push({title: this.MoreReplyFrom.wdNedda, nums: [this.MoreReplyFrom.CargoM.trim()]})
+      } else {
+        const hasKey = tempNumList.some(item => item.title === this.MoreReplyFrom.wdNedda)
+        if(hasKey) {
+          for(let i = 0; i < tempNumList.length; i++) {
+
+            if(tempNumList[i].title === this.MoreReplyFrom.wdNedda && !tempNumList[i].nums.includes(this.MoreReplyFrom.CargoM.trim())) {
+              tempNumList[i].nums.push(this.MoreReplyFrom.CargoM.trim())
+              break; 
+            }
+          }
+        } else {
+          tempNumList.push({title: this.MoreReplyFrom.wdNedda, nums: [this.MoreReplyFrom.CargoM.trim()]})
+        }
+      }
+      this.tempNumList = tempNumList
+    },
     //温度计编码验证
     async ThermometerVerification(){
       const params ={
@@ -1074,7 +1107,7 @@ export default {
       const res = await ThermometerVerification(params)
       if(res.data.code ==200){
         this.$Message.success(res.data.msg)
-        
+        this.initTempNumsList()
 
       }else{
         this.$Message.error(res.data.msg)
