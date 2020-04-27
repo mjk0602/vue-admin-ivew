@@ -234,8 +234,6 @@
       :footer-hide="false"
       :closable="false"
     >
-
-
       <Row>
         <Form>
           <FormItem>
@@ -392,7 +390,11 @@
                   <i-col>
                     <FormItem label="温度要求" style="margin: -25px 0 0;background: #fff">
                       <Select v-model="OrderReplyFrom.WDQJ" @on-change="bindSingleTempChange">
-                        <Option v-for="(item, index) in requiredTempList" :value="item.WDQJ" :key="index">{{item.WDQJ}}</Option>
+                        <Option
+                          v-for="(item, index) in requiredTempList"
+                          :value="item.WDQJ"
+                          :key="index"
+                        >{{item.WDQJ}}</Option>
                       </Select>
                     </FormItem>
                   </i-col>
@@ -538,12 +540,25 @@
                   <template>
                     <Table border :columns="columns1" :data="MoreOrderList">
                       <template slot-scope="{ row, index }" slot="PackageName">
-                        <Select @on-change="bindPackageNameChange($event, row)" v-model="row.PackageName" transfer @on-open-change="getBoxData($event, row)">
-                          <Option v-for="(item, sindex) in packageList[index]" :value="item.PackageType" :key="sindex">{{ item.PackageType }}</Option>
+                        <Select
+                          @on-change="bindPackageNameChange($event, row)"
+                          v-model="row.PackageName"
+                          transfer
+                          @on-open-change="getBoxData($event, row)"
+                        >
+                          <Option
+                            v-for="(item, sindex) in packageList[index]"
+                            :value="item.PackageType"
+                            :key="sindex"
+                          >{{ item.PackageType }}</Option>
                         </Select>
                       </template>
                       <template slot-scope="{ row, index }" slot="Jian">
-                        <InputNumber @on-change="bindPackageNameChange(true, row)" :min="1" v-model="row.Jian"></InputNumber>
+                        <InputNumber
+                          @on-change="bindPackageNameChange(true, row)"
+                          :min="1"
+                          v-model="row.Jian"
+                        ></InputNumber>
                       </template>
                       <template slot-scope="{ row, index }" slot="VWeight">
                         <Input v-model="row.VWeight"></Input>
@@ -564,7 +579,12 @@
                 <i-col>
                   <FormItem label="温度要求">
                     <Select v-model="MoreReplyFrom.wdNedda">
-                      <Option v-for="(item,i) in boxListBOXS" :key="i" :label="item.WDQJ" :value="item.WDQJ"></Option>
+                      <Option
+                        v-for="(item,i) in boxListBOXS"
+                        :key="i"
+                        :label="item.WDQJ"
+                        :value="item.WDQJ"
+                      ></Option>
                     </Select>
                   </FormItem>
                   <FormItem label="温度计编码">
@@ -572,9 +592,23 @@
                   </FormItem>
                 </i-col>
                 <i-col>
-                  <div v-for="(item, index) in tempNumList" :key="index">
-                    <span>{{item.title}}</span>
-                    <Tag type="border" v-for="(sItem, sIndex) in item.nums" :key="sIndex" closable color="primary" @on-close="handleCloseTag(index, sIndex)">{{sItem}}</Tag>
+                  <div
+                    v-for="(item, index) in tempNumList"
+                    :key="index"
+                    
+                  >
+              
+                     <span>{{item.title}}</span>
+                    <Tag
+                      type="border"
+                      v-for="(sItem, sIndex) in item.nums"
+                      :key="sIndex"
+                      closable
+                      color="primary"
+                      @on-close="handleCloseTag(index, sIndex)"
+                    >{{sItem}}</Tag>
+                    <Button size="small" type="error" @click="deltempNumList">删除</Button>
+               
                   </div>
                 </i-col>
               </Row>
@@ -629,24 +663,24 @@ export default {
         {
           title: "件数",
           key: "Jian",
-          slot: 'Jian'
+          slot: "Jian"
         },
         {
           title: "重量",
           key: "VWeight",
-          slot: 'VWeight'
+          slot: "VWeight"
         },
         {
           title: "货物尺寸",
           key: "Size",
-          slot: 'Size'
+          slot: "Size"
         }
       ],
       MoreOrderList: [],
       MoreReplyFrom: {
         Time: "07:0",
         hours: "",
-        CargoM:"",
+        CargoM: ""
       },
       zibeibaoJian2: "",
       zibeibao: [{ PackageName2: "自备包材重量", Idisabled: true }],
@@ -987,22 +1021,24 @@ export default {
     };
   },
   methods: {
+    //删除温度计编码
+    deltempNumList(){},
     //添加温度计编码
-    AddwdjNumber(){
-     this.ThermometerVerification()
+    AddwdjNumber() {
+      this.ThermometerVerification();
     },
     bindInputSinglePackageName(e, item, index) {
-      this.$set(this.boxList[index], 'Jian', e)
+      this.$set(this.boxList[index], "Jian", e);
       const lists = this.boxList.filter((sItem, sIndex) => {
-        return !sItem.Idisabled && sItem.Jian
-      })
-      console.log(lists)
-      this.getCheckSize('single', lists)
+        return !sItem.Idisabled && sItem.Jian;
+      });
+      console.log(lists);
+      this.getCheckSize("single", lists);
     },
     async bindSingleTempChange(e) {
-      this.$set(this.OrderReplyFrom, 'WDQJ', e)
-      const res = await this.getOneBoxData({ WDQJ: e, State: 'Box'})
-      console.log(res)
+      this.$set(this.OrderReplyFrom, "WDQJ", e);
+      const res = await this.getOneBoxData({ WDQJ: e, State: "Box" });
+      console.log(res);
       this.BoxContent = res;
       this.boxList.forEach(item => {
         item.Jian = "";
@@ -1015,48 +1051,65 @@ export default {
     async getCheckSize(sign, lists) {
       const params = {
         Box: JSON.stringify(lists)
-      }
-      let res = await getCheckSize(params)
-      if(res.data.code === '200') {
-        const checkSizeData = res.data
-        if(sign === 'single') {
-          
-          this.$set(this.OrderReplyFrom, 'CountWeight', checkSizeData.CountWeight)
-          this.$set(this.OrderReplyFrom, 'CountVolume', checkSizeData.CountVolume)
-          this.$set(this.OrderReplyFrom, 'Jian', checkSizeData.CountJian)
-          this.$set(this.OrderReplyFrom, 'CargoSizeAll', checkSizeData.CargoSizeAll)
-          
+      };
+      let res = await getCheckSize(params);
+      if (res.data.code === "200") {
+        const checkSizeData = res.data;
+        if (sign === "single") {
+          this.$set(
+            this.OrderReplyFrom,
+            "CountWeight",
+            checkSizeData.CountWeight
+          );
+          this.$set(
+            this.OrderReplyFrom,
+            "CountVolume",
+            checkSizeData.CountVolume
+          );
+          this.$set(this.OrderReplyFrom, "Jian", checkSizeData.CountJian);
+          this.$set(
+            this.OrderReplyFrom,
+            "CargoSizeAll",
+            checkSizeData.CargoSizeAll
+          );
         } else {
-          this.$set(this.MoreReplyFrom, 'CountWeight', checkSizeData.CountWeight)
-          this.$set(this.MoreReplyFrom, 'CountVolume', checkSizeData.CountVolume)
-          this.$set(this.MoreReplyFrom, 'BoxJian', checkSizeData.CountJian)
-          this.MoreOrderList = checkSizeData.data
-
+          this.$set(
+            this.MoreReplyFrom,
+            "CountWeight",
+            checkSizeData.CountWeight
+          );
+          this.$set(
+            this.MoreReplyFrom,
+            "CountVolume",
+            checkSizeData.CountVolume
+          );
+          this.$set(this.MoreReplyFrom, "BoxJian", checkSizeData.CountJian);
+          this.MoreOrderList = checkSizeData.data;
         }
       }
     },
     bindPackageNameChange(item, row) {
-      this.$set(this.MoreOrderList[row._index], 'PackageName', row.PackageName)
-      this.$set(this.MoreOrderList[row._index], 'Jian', row.Jian)
-      this.getCheckSize('more', this.MoreOrderList)
+      this.$set(this.MoreOrderList[row._index], "PackageName", row.PackageName);
+      this.$set(this.MoreOrderList[row._index], "Jian", row.Jian);
+      this.getCheckSize("more", this.MoreOrderList);
     },
     async getBoxData(e, row) {
-      if(e) {
+      if (e) {
         const params = {
           WDQJ: row.WDQJ,
-          State: 'Box'
-        }
-        let res = await getBoxData(params)
-        if(res.data.code === '200') {
-          this.$set(this.packageList, row._index, res.data.data)
+          State: "Box"
+        };
+        let res = await getBoxData(params);
+        if (res.data.code === "200") {
+          this.$set(this.packageList, row._index, res.data.data);
         }
       }
     },
     // 获取 单温区  温度要求
     async getOneBoxData(params) {
-      let res = await getBoxData(params)
-      if(res.data.code === '200') {
-        return res.data.data
+      let res = await getBoxData(params);
+      if (res.data.code === "200") {
+        return res.data.data;
       }
     },
     handleSelectionChange(val) {
@@ -1072,45 +1125,54 @@ export default {
       this.saveTakeDriveData();
     },
     handleCloseTag(index, sIndex) {
-      if(this.tempNumList[index].nums.length > 1) {
-        this.tempNumList[index].nums.splice(sIndex, 1)
+      if (this.tempNumList[index].nums.length > 1) {
+        this.tempNumList[index].nums.splice(sIndex, 1);
       } else {
-        this.$delete(this.tempNumList, index)
+        this.$delete(this.tempNumList, index);
       }
     },
     initTempNumsList() {
-      const tempNumList = JSON.parse(JSON.stringify(this.tempNumList))
+      const tempNumList = JSON.parse(JSON.stringify(this.tempNumList));
 
-      if(tempNumList.length === 0) {
-        tempNumList.push({title: this.MoreReplyFrom.wdNedda, nums: [this.MoreReplyFrom.CargoM.trim()]})
+      if (tempNumList.length === 0) {
+        tempNumList.push({
+          title: this.MoreReplyFrom.wdNedda,
+          nums: [this.MoreReplyFrom.CargoM.trim()]
+        });
       } else {
-        const hasKey = tempNumList.some(item => item.title === this.MoreReplyFrom.wdNedda)
-        if(hasKey) {
-          for(let i = 0; i < tempNumList.length; i++) {
-
-            if(tempNumList[i].title === this.MoreReplyFrom.wdNedda && !tempNumList[i].nums.includes(this.MoreReplyFrom.CargoM.trim())) {
-              tempNumList[i].nums.push(this.MoreReplyFrom.CargoM.trim())
-              break; 
+        const hasKey = tempNumList.some(
+          item => item.title === this.MoreReplyFrom.wdNedda
+        );
+        if (hasKey) {
+          for (let i = 0; i < tempNumList.length; i++) {
+            if (
+              tempNumList[i].title === this.MoreReplyFrom.wdNedda &&
+              !tempNumList[i].nums.includes(this.MoreReplyFrom.CargoM.trim())
+            ) {
+              tempNumList[i].nums.push(this.MoreReplyFrom.CargoM.trim());
+              break;
             }
           }
         } else {
-          tempNumList.push({title: this.MoreReplyFrom.wdNedda, nums: [this.MoreReplyFrom.CargoM.trim()]})
+          tempNumList.push({
+            title: this.MoreReplyFrom.wdNedda,
+            nums: [this.MoreReplyFrom.CargoM.trim()]
+          });
         }
       }
-      this.tempNumList = tempNumList
+      this.tempNumList = tempNumList;
     },
     //温度计编码验证
-    async ThermometerVerification(){
-      const params ={
-        WDJ:this.MoreReplyFrom.CargoM,
+    async ThermometerVerification() {
+      const params = {
+        WDJ: this.MoreReplyFrom.CargoM
       };
-      const res = await ThermometerVerification(params)
-      if(res.data.code ==200){
-        this.$Message.success(res.data.msg)
-        this.initTempNumsList()
-
-      }else{
-        this.$Message.error(res.data.msg)
+      const res = await ThermometerVerification(params);
+      if (res.data.code == 200) {
+        this.$Message.success(res.data.msg);
+        this.initTempNumsList();
+      } else {
+        this.$Message.error(res.data.msg);
       }
     },
     //获取分配司机
@@ -1175,12 +1237,12 @@ export default {
         this.OrderReplyFrom = res.data.data;
         // 调用获取 单温区  温度要求接口
         const requiredTempList = await this.getOneBoxData({
-          WDQJ: '',
-          State: 'WDQJ'
-        })
-        console.log(WDQJ)
+          WDQJ: "",
+          State: "WDQJ"
+        });
+        console.log(WDQJ);
         this.requiredTempList = requiredTempList;
-        this.bindSingleTempChange(WDQJ)
+        this.bindSingleTempChange(WDQJ);
 
         this.boxList.forEach(function(item) {
           item.Jian = "";
@@ -1202,9 +1264,11 @@ export default {
         this.MoreOrderReply = true;
         this.MoreReplyFrom = res.data.data;
         res.data.data.Box.forEach((item, index) => {
-          item.Jian = +item.Jian
-          this.$set(this.packageList, index, [{PackageType: item.PackageName}] )
-        })
+          item.Jian = +item.Jian;
+          this.$set(this.packageList, index, [
+            { PackageType: item.PackageName }
+          ]);
+        });
         this.MoreOrderList = res.data.data.Box;
 
         this.getWdjNee();
@@ -1427,7 +1491,9 @@ export default {
     initSearchData() {
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
-      const dateTime = new Date(currentYear, currentMonth, "01", "0", "0", "0").getTime() / 1000;
+      const dateTime =
+        new Date(currentYear, currentMonth, "01", "0", "0", "0").getTime() /
+        1000;
       const time1 = getDate(dateTime, "year");
       const time2 = getDate(new Date().getTime() / 1000, "year");
       this.formInline.TakeTime = [time1, time2];
@@ -1485,6 +1551,8 @@ export default {
 
   border: #06c solid 1px;
 }
+
+
 </style>
 <style>
 .ivu-table .demo-table-info-cell-name {

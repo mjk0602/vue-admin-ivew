@@ -30,10 +30,8 @@ export const  saveTakeDriveData = (params)=>{
 export const  ThermometerVerification = (params)=>{
     return axios.request({url:'taskallocation/checkwdj',method:'post',params})
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> e68668ef6fccc1eceee9965712b0d796ad6cf15f
+
 export const  getBoxData = (params)=>{
     return axios.request({url:'taskallocation/wdqjbox',method:'post',params})
 }

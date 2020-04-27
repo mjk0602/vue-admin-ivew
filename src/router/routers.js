@@ -136,7 +136,153 @@ export default [
 
         ]
 
-      }
+      },
+      {
+        path:'/page3',
+        name:'page3',
+        meta:{
+          title: '运单查询',
+          notCache: false,
+          
+          showAlways: true
+        },
+        component:ParentView,
+        children:[
+          {
+            path: '/TrackingWaybill',
+            name: 'TrackingWaybill',
+            meta: {
+              title: '运单信息跟踪',
+              notCache: false,
+              
+            },
+            component: () => import('@/views/single-page/TrackingWaybill.vue')
+          },
+          {
+            path: '/InformationEntry',
+            name: 'InformationEntry',
+            meta: {
+              title: '信息录入',
+              notCache: false,
+              
+            },
+            component: () => import('@/views/single-page/InformationEntry.vue')
+          },
+          {
+            path: '/ChangeInformation',
+            name: 'ChangeInformation',
+            meta: {
+              title: '运单修改',
+              notCache: false,
+              
+            },
+            component: () => import('@/views/single-page/ChangeInformation.vue')
+          },
+
+        ]
+
+      },
+      {
+        path: '/iceQuery',
+        name: 'iceQuery',
+        meta: {
+          title: '干冰查询',
+          hideInMenu: false
+        },
+        component: () => import('@/views/single-page/iceQuery.vue')
+      },
+      {
+        path: '/clamminess',
+        name: 'clamminess',
+        meta: {
+          title: '释冷核对',
+          hideInMenu: false
+        },
+        component: () => import('@/views/single-page/clamminess.vue')
+      },
+      {
+        path:'/AssignmentDepute',
+        name:'AssignmentDepute',
+        meta:{
+          title:'操作人员分配',
+          hideInMenu:false
+        },
+        component: () => import('@/views/single-page/AssignmentDepute.vue')
+      },
+      {
+        path: '/page4',
+        name: 'page4',
+        meta: {
+          title: '阿米巴报表',
+          notCache: false,
+          
+          showAlways: true
+        },
+        component: ParentView,
+        children: [
+          {
+            path: '/Addcharges',
+            name: 'Addcharges',
+            meta: {
+              title: '费用管理',
+              notCache: false,
+              
+            },
+            component: () => import('@/views/single-page/Addcharges.vue')
+          },
+          {
+            path: '/newCharges',
+            name: 'newCharges',
+            meta: {
+              title: '费用统计',
+              notCache: false,
+              
+            },
+            component: () => import('@/views/single-page/newCharges.vue')
+          },
+          {
+            path: '/FixedCostManagement',
+            name: 'FixedCostManagement',
+            meta: {
+              title: '固定费用管理',
+              notCache: false,
+              
+            },
+            component: () => import('@/views/single-page/FixedCostManagement.vue')
+          },
+          {
+            path: '/ownProducts',
+            name: 'ownProducts',
+            meta: {
+              title: '自用产品摊销管理',
+              notCache: false,
+              
+            },
+            component: () => import('@/views/single-page/ownProducts.vue')
+          },   
+          {
+            path: '/InternalSettlementIncome',
+            name: 'InternalSettlementIncome',
+            meta: {
+              title: '内部结算收入管理',
+              notCache: false,
+              
+            },
+            component: () => import('@/views/single-page/InternalSettlementIncome.vue')
+          },
+          
+          
+     
+         
+
+        ]
+
+      },
+     
+     
+
+    
+      
     ]
   },
   {
