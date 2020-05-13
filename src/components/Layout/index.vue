@@ -24,7 +24,9 @@
           </div>
           <Content class="content-wrapper">
             <keep-alive :include="cacheList">
+              <transition name="fade-transform" mode="out-in">
               <router-view/>
+              </transition>
             </keep-alive>
             <ABackTop :height="100" :bottom="80" :right="50" container=".content-wrapper"></ABackTop>
           </Content>

@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view/>
+    <transition name="fade-transform" mode="out-in">
+     <router-view></router-view>
+    </transition>
   </div>
 </template>
 
@@ -18,4 +20,9 @@ html,body{
 #app {
   .size;
 }
+
+</style>
+<style >
+
+
 </style>

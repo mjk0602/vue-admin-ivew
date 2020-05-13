@@ -1506,7 +1506,7 @@ export default {
   },
   mounted() {
     // 写个方法获取那个列表，在这调用 初始化
-    this.userInfo = JSON.parse(Cookies.get("userInfo"));
+       this.userInfo = JSON.parse(Cookies.get("userInfo"));
     this.getData();
     this.getSendsCompany();
     this.GetDepartData();

@@ -43,20 +43,12 @@ export default {
         BillNumber: ""
       },
       ruleValidate: {
-        carNumbers: [
-          {required: true,message: "请选择车牌号码",trigger: "change"},
-          
-        ],
-         driverName: [
-          {required: true,message: "请选择司机姓名",trigger: "change" },
-          
-        ], 
+        carNumbers: [{required: true,message: "请选择车牌号码",trigger: "change"},],
+        driverName: [ {required: true,message: "请选择司机姓名",trigger: "change" },], 
         BillNumber: [
           {required: true,message: "请输入运单号", trigger: "blur" },
           { min: 12, max: 12, message: "运单号长度为12位", trigger: "blur" }
-          
-        ],
-
+          ]
       },
       driverNameData: [], //司机姓名数组
       CarNumberData: [] //车牌号
@@ -95,12 +87,11 @@ export default {
       const res = await  VerifyBillNumber(params)
 
       if(res.data.code == 200){
+        
 
       }else{
-
+       this.$Message.error(res.data.msg);
       }
-      
-
     },
     //入库
     addRuku(name) {
